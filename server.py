@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, render_template
 from EmotionDetection.emotion_detection import emotion_detector
 
 
@@ -13,30 +13,30 @@ def sent_emotion_detector():
 
     text_to_analyze = request.args.get("textToAnalyze")
 
-    if not response.strip():  # Check for blank input
-        return jsonify({
-            'anger': None,
-            'disgust': None,
-            'fear': None,
-            'joy': None,
-            'sadness': None,
-            'dominant_emotion': None
-        }), 400
+    status_code = 200
+    anger = None
+    disgust = None
+    fear = None
+    joy = None
+    sadness = None
+    dominant_emotion = None
+    
+    if not text_to_analyze.strip():
+        status_code = 400
+    else:
+        response = emotion_detector(text_to_analyze)
 
-
-    response = emotion_detector(text_to_analyze)
-
-    anger = response["anger"]
-    disgust = response["disgust"]
-    fear = response["fear"]
-    joy = response["joy"]
-    sadness = response["sadness"]
-    dominant_emotion = response["dominant_emotion"]
+        anger = response["anger"]
+        disgust = response["disgust"]
+        fear = response["fear"]
+        joy = response["joy"]
+        sadness = response["sadness"]
+        dominant_emotion = response["dominant_emotion"]
 
 
     return f"""For the give statement, the system response is 'anger': {anger}, 
             'disgust':{disgust}, 'fear':{fear}, 'joy':{joy} and 'sadness':{sadness}. 
-            The dominant emotion is <b>{dominant_emotion}</b>."""
+            The dominant emotion is <b>{dominant_emotion}</b>.""", status_code
 
 
 
